@@ -1,0 +1,19 @@
+{
+  "matches": [
+    {
+      "vulnerability": {
+        "id": "CVE-2021-1234",
+        "severity": "High",
+        "description": "Prototype pollution in lodash",
+        "dataSource": "https://example.com/CVE-2021-1234",
+        "fix": {"versions": ["4.17.21"]}
+      },
+      "artifact": {
+        "name": "lodash",
+        "version": "4.17.20",
+        "type": "npm",
+        "locations": [{"path": "/app/package-lock.json"}]
+      }
+    }
+  ]
+}

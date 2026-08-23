@@ -1,0 +1,17 @@
+{
+  "vulns": [
+    {
+      "id": "GHSA-test-lodash",
+      "summary": "Prototype pollution in lodash",
+      "affected": [
+        {
+          "package": {"ecosystem": "npm", "name": "lodash"},
+          "ranges": [
+            {"type": "SEMVER", "events": [{"introduced": "0"}, {"fixed": "4.17.21"}]}
+          ]
+        }
+      ],
+      "references": [{"type": "ADVISORY", "url": "https://example.com/GHSA-test-lodash"}]
+    }
+  ]
+}

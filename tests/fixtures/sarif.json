@@ -1,0 +1,22 @@
+{
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "customtool",
+          "rules": [
+            {"id": "RULE-1", "shortDescription": {"text": "Vulnerable dependency"}, "helpUri": "https://example.com/RULE-1"}
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "RULE-1",
+          "level": "error",
+          "message": {"text": "lodash is vulnerable"},
+          "locations": [{"physicalLocation": {"artifactLocation": {"uri": "package-lock.json"}}}]
+        }
+      ]
+    }
+  ]
+}

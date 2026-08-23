@@ -1,0 +1,82 @@
+name: patchwork
+description: Bring-your-own-scanner, bring-your-own-feed vulnerability scanning with agent-driven auto-fix PRs.
+branding:
+  icon: shield
+  color: purple
+
+inputs:
+  path:
+    description: Directory to scan
+    default: "."
+  config:
+    description: Path to patchwork.toml
+    required: false
+  fail-on:
+    description: Minimum severity that fails the job (critical|high|medium|low|none)
+    default: "high"
+  sarif-output:
+    description: Path to write the SARIF report
+    default: "patchwork.sarif"
+  upload-sarif:
+    description: Upload the SARIF report to GitHub Code Scanning
+    default: "true"
+  fix:
+    description: Open auto-fix PRs for found vulnerabilities
+    default: "false"
+  agent:
+    description: Coding agent to use for fixes (claude|codex)
+    default: "claude"
+  max-prs:
+    description: Max number of fix PRs to open per run
+    default: "5"
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install patchwork
+      shell: bash
+      run: pip install "${{ github.action_path }}[yaml]"
+
+    - name: Install agent CLI
+      if: inputs.fix == 'true'
+      shell: bash
+      run: |
+        if [ "${{ inputs.agent }}" = "codex" ]; then
+          npm install -g @openai/codex
+        else
+          npm install -g @anthropic-ai/claude-code
+        fi
+
+    - name: Scan
+      id: scan
+      shell: bash
+      run: |
+        set +e
+        ARGS="${{ inputs.path }}"
+        [ -n "${{ inputs.config }}" ] && ARGS="$ARGS --config ${{ inputs.config }}"
+        patchwork scan $ARGS --format sarif -o "${{ inputs.sarif-output }}" --fail-on "${{ inputs.fail-on }}"
+        echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+    - name: Upload SARIF
+      if: inputs.upload-sarif == 'true'
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ inputs.sarif-output }}
+
+    - name: Open fix PRs
+      if: inputs.fix == 'true'
+      shell: bash
+      run: |
+        ARGS="${{ inputs.path }}"
+        [ -n "${{ inputs.config }}" ] && ARGS="$ARGS --config ${{ inputs.config }}"
+        patchwork fix $ARGS --agent "${{ inputs.agent }}" --max "${{ inputs.max-prs }}" --pr
+
+    - name: Fail on findings
+      if: steps.scan.outputs.exit_code != '0'
+      shell: bash
+      run: exit 1

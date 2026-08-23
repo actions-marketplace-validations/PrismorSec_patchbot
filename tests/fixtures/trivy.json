@@ -1,0 +1,19 @@
+{
+  "Results": [
+    {
+      "Target": "package-lock.json",
+      "Type": "npm",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2021-1234",
+          "PkgName": "lodash",
+          "InstalledVersion": "4.17.20",
+          "FixedVersion": "4.17.21",
+          "Severity": "HIGH",
+          "Title": "Prototype pollution",
+          "PrimaryURL": "https://example.com/CVE-2021-1234"
+        }
+      ]
+    }
+  ]
+}
