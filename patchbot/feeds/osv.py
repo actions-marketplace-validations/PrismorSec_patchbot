@@ -12,8 +12,8 @@ import urllib.error
 import urllib.request
 from typing import Any, Dict, List
 
-from autopatch.models import Finding, Package
-from autopatch.versions import fixed_versions_for
+from patchbot.models import Finding, Package
+from patchbot.versions import fixed_versions_for
 
 OSV_BATCH_URL = "https://api.osv.dev/v1/querybatch"
 OSV_VULN_URL_TEMPLATE = "https://api.osv.dev/v1/vulns/{id}"
@@ -35,7 +35,7 @@ def _post_json(url: str, body: Dict[str, Any], timeout: int = 10):
             url,
             data=json.dumps(body).encode("utf-8"),
             headers={"Content-Type": "application/json", "Accept": "application/json",
-                     "User-Agent": "autopatch/1.0"},
+                     "User-Agent": "patchbot/1.0"},
             method="POST",
         )
         with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -47,7 +47,7 @@ def _post_json(url: str, body: Dict[str, Any], timeout: int = 10):
 def _get_json(url: str, timeout: int = 5):
     try:
         req = urllib.request.Request(
-            url, headers={"Accept": "application/json", "User-Agent": "autopatch/1.0"},
+            url, headers={"Accept": "application/json", "User-Agent": "patchbot/1.0"},
         )
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode("utf-8"))

@@ -1,4 +1,4 @@
-"""autopatch.toml loader. CLI flags always win over file config."""
+"""patchbot.toml loader. CLI flags always win over file config."""
 from __future__ import annotations
 
 import tomllib
@@ -22,7 +22,7 @@ class Config:
     @classmethod
     def load(cls, path: Optional[str]) -> "Config":
         cfg = cls()
-        toml_path = Path(path) if path else Path("autopatch.toml")
+        toml_path = Path(path) if path else Path("patchbot.toml")
         if not toml_path.exists():
             return cfg
         data = tomllib.loads(toml_path.read_text(encoding="utf-8"))

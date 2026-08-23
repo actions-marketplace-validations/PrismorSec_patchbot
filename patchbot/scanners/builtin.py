@@ -1,7 +1,7 @@
 """Built-in scanner wrappers: shell out to a CLI, parse its JSON output.
 
 Each expects its tool to already be installed (trivy, grype, osv-scanner) —
-autopatch doesn't manage tool installs; the GitHub Action or the user's own
+patchbot doesn't manage tool installs; the GitHub Action or the user's own
 environment does. `command` is the generic BYO-scanner escape hatch: run
 any command and parse its stdout with one of the known formats.
 """
@@ -11,8 +11,8 @@ import shutil
 import subprocess
 from typing import List
 
-from autopatch.models import Finding
-from autopatch.scanners import formats
+from patchbot.models import Finding
+from patchbot.scanners import formats
 
 
 def _run(cmd: List[str]) -> str:

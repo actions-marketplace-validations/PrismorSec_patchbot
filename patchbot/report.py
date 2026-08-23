@@ -4,10 +4,10 @@ from __future__ import annotations
 import json
 from typing import List
 
-from autopatch.models import Finding, SEVERITY_ORDER, severity_rank, sort_findings
+from patchbot.models import Finding, SEVERITY_ORDER, severity_rank, sort_findings
 
-TOOL_NAME = "autopatch"
-TOOL_URI = "https://github.com/ar9av/autopatch"
+TOOL_NAME = "patchbot"
+TOOL_URI = "https://github.com/ar9av/patchbot"
 
 
 def to_table(findings: List[Finding]) -> str:

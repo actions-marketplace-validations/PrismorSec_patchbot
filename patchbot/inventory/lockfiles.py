@@ -1,7 +1,7 @@
 """Manifest and lockfile parsers.
 
 Ported from prismor's prismor/runtime/deps.py — trimmed to pure functions
-that return Package objects instead of dicts, since autopatch has no
+that return Package objects instead of dicts, since patchbot has no
 policy-feed correlation step of its own.
 """
 from __future__ import annotations
@@ -13,7 +13,7 @@ from fnmatch import fnmatch
 from pathlib import Path
 from typing import Dict, Iterator, List
 
-from autopatch.models import Package
+from patchbot.models import Package
 
 _SKIP_DIR_NAMES = frozenset({
     ".git", ".hg", ".svn",
@@ -209,7 +209,7 @@ def collect(workspace: Path) -> List[Package]:
     JS ecosystems resolve through lockfiles (npm/pnpm/yarn all merge into
     one flat name->version map, unioned since they're all the "npm" OSV
     ecosystem). Other ecosystems are read straight off the manifest since
-    autopatch doesn't parse poetry.lock/Cargo.lock/go.sum — see README for
+    patchbot doesn't parse poetry.lock/Cargo.lock/go.sum — see README for
     the CycloneDX SBOM path if you need transitive deps there.
     """
     packages: List[Package] = []

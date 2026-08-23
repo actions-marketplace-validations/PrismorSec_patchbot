@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "autopatch"
+name = "patchbot"
 version = "0.1.0"
 description = "Bring-your-own-scanner, bring-your-own-feed vulnerability scanning with agent-driven auto-fix PRs."
 readme = "README.md"
@@ -16,10 +16,10 @@ yaml = ["PyYAML"]
 dev = ["pytest"]
 
 [project.scripts]
-autopatch = "autopatch.cli:main"
+patchbot = "patchbot.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["autopatch"]
+packages = ["patchbot"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

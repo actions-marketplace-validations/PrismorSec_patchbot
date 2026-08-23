@@ -5,8 +5,8 @@ its transcript adapters: a dict of builtins, merged with anything a
 third-party package registers under the matching entry-point group in its
 own pyproject.toml, e.g.:
 
-    [project.entry-points."autopatch.scanners"]
-    mytool = "autopatch_mytool:scanner_module"
+    [project.entry-points."patchbot.scanners"]
+    mytool = "patchbot_mytool:scanner_module"
 """
 from __future__ import annotations
 

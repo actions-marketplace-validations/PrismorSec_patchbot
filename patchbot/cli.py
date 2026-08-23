@@ -4,16 +4,16 @@ import argparse
 import sys
 from pathlib import Path
 
-from autopatch import inventory, feeds, scanners, report, fix
-from autopatch.config import Config
-from autopatch.registry import load_plugins
+from patchbot import inventory, feeds, scanners, report, fix
+from patchbot.config import Config
+from patchbot.registry import load_plugins
 
 
 def _collect_findings(cfg: Config, cwd: str):
     packages = inventory.collect(cfg.paths, cfg.sbom)
     findings = feeds.match_all(packages, cfg.feeds)
     findings.extend(scanners.run_all(cwd, cfg.scanners))
-    from autopatch.models import dedupe
+    from patchbot.models import dedupe
     findings = dedupe(findings)
     return [f for f in findings if f.id not in cfg.ignore]
 
@@ -61,22 +61,22 @@ def cmd_fix(args) -> int:
 
 
 def cmd_plugins(args) -> int:
-    from autopatch.feeds import BUILTIN as feed_builtins
-    from autopatch.scanners import BUILTIN as scanner_builtins
-    from autopatch.agents import BUILTIN as agent_builtins
-    print("feeds:   ", sorted(load_plugins("autopatch.feeds", feed_builtins)))
-    print("scanners:", sorted(load_plugins("autopatch.scanners", scanner_builtins)))
-    print("agents:  ", sorted(load_plugins("autopatch.agents", agent_builtins)))
+    from patchbot.feeds import BUILTIN as feed_builtins
+    from patchbot.scanners import BUILTIN as scanner_builtins
+    from patchbot.agents import BUILTIN as agent_builtins
+    print("feeds:   ", sorted(load_plugins("patchbot.feeds", feed_builtins)))
+    print("scanners:", sorted(load_plugins("patchbot.scanners", scanner_builtins)))
+    print("agents:  ", sorted(load_plugins("patchbot.agents", agent_builtins)))
     return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="autopatch")
+    parser = argparse.ArgumentParser(prog="patchbot")
     sub = parser.add_subparsers(dest="command", required=True)
 
     scan = sub.add_parser("scan", help="scan for vulnerable packages")
     scan.add_argument("paths", nargs="*", default=["."])
-    scan.add_argument("--config", help="path to autopatch.toml")
+    scan.add_argument("--config", help="path to patchbot.toml")
     scan.add_argument("--format", choices=sorted(report.FORMATS), default="table")
     scan.add_argument("-o", "--output", help="write report to a file instead of stdout")
     scan.add_argument("--fail-on", choices=["critical", "high", "medium", "low", "none"])
@@ -84,7 +84,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     fix_p = sub.add_parser("fix", help="open fix PRs for vulnerable packages via a coding agent")
     fix_p.add_argument("paths", nargs="*", default=["."])
-    fix_p.add_argument("--config", help="path to autopatch.toml")
+    fix_p.add_argument("--config", help="path to patchbot.toml")
     fix_p.add_argument("--agent", choices=["claude", "codex"])
     fix_p.add_argument("--max", type=int, help="max packages to fix in this run")
     fix_p.add_argument("--pr", action="store_true", help="push the branch and open a PR (needs gh)")

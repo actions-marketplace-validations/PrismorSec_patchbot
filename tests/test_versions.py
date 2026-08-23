@@ -1,4 +1,4 @@
-from autopatch.versions import parse_version, version_lt, version_gte, in_range, fixed_versions_for
+from patchbot.versions import parse_version, version_lt, version_gte, in_range, fixed_versions_for
 
 
 def test_parse_version_basic():

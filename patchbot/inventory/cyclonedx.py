@@ -1,7 +1,7 @@
 """CycloneDX SBOM -> Package list.
 
 Lets any tool that can emit an SBOM (syft, cdxgen, a vendor scanner) feed
-autopatch's inventory, covering ecosystems autopatch has no native lockfile
+patchbot's inventory, covering ecosystems patchbot has no native lockfile
 parser for.
 """
 from __future__ import annotations
@@ -11,9 +11,9 @@ import re
 from pathlib import Path
 from typing import List
 
-from autopatch.models import Package
+from patchbot.models import Package
 
-# purl type -> OSV/autopatch ecosystem name.
+# purl type -> OSV/patchbot ecosystem name.
 _PURL_ECOSYSTEM = {
     "npm": "npm",
     "pypi": "pip",

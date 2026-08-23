@@ -11,9 +11,9 @@ import urllib.request
 from pathlib import Path
 from typing import List
 
-from autopatch.models import Finding, Package
-from autopatch.versions import fixed_versions_for, in_range
-from autopatch.feeds.osv import classify_severity, summary_of, url_for, _ECOSYSTEM_MAP
+from patchbot.models import Finding, Package
+from patchbot.versions import fixed_versions_for, in_range
+from patchbot.feeds.osv import classify_severity, summary_of, url_for, _ECOSYSTEM_MAP
 
 
 def _load(source: str) -> list:

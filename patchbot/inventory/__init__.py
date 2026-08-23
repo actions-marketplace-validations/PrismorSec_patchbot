@@ -3,8 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import List, Optional
 
-from autopatch.models import Package
-from autopatch.inventory import lockfiles, cyclonedx
+from patchbot.models import Package
+from patchbot.inventory import lockfiles, cyclonedx
 
 
 def collect(paths: List[str], sbom: Optional[str] = None) -> List[Package]:

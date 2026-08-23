@@ -3,8 +3,8 @@ import subprocess
 import sys
 import types
 
-from autopatch.models import Finding, Package
-from autopatch import fix
+from patchbot.models import Finding, Package
+from patchbot import fix
 
 
 def _git_repo(tmp_path):
@@ -60,7 +60,7 @@ def test_successful_fix_commits_on_new_branch(tmp_path, monkeypatch):
 
     branch = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=repo,
                              capture_output=True, text=True).stdout.strip()
-    assert branch == "autopatch-npm-lodash"
+    assert branch == "patchbot-npm-lodash"
 
 
 def test_failed_fix_resets_to_base_branch(tmp_path, monkeypatch):

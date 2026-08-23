@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from autopatch.scanners import formats
+from patchbot.scanners import formats
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
