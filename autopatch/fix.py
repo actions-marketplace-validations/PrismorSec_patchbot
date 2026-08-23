@@ -10,9 +10,9 @@ from collections import defaultdict
 from pathlib import Path
 from typing import List, Optional
 
-from patchwork import agents, inventory
-from patchwork.models import Finding
-from patchwork.versions import version_gte
+from autopatch import agents, inventory
+from autopatch.models import Finding
+from autopatch.versions import version_gte
 
 
 def _git(args: List[str], cwd: str) -> subprocess.CompletedProcess:
@@ -79,7 +79,7 @@ def run(
             results.append({"package": f"{ecosystem}:{name}", "status": "dry-run", "detail": prompt})
             continue
 
-        branch = f"patchwork/{ecosystem}-{name}".replace("/", "-")
+        branch = f"autopatch/{ecosystem}-{name}".replace("/", "-")
         _git(["switch", "-c", branch], cwd)
 
         agent.run(prompt, cwd)

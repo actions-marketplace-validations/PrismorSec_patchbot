@@ -1,4 +1,4 @@
-name: patchwork
+name: autopatch
 description: Bring-your-own-scanner, bring-your-own-feed vulnerability scanning with agent-driven auto-fix PRs.
 branding:
   icon: shield
@@ -9,14 +9,14 @@ inputs:
     description: Directory to scan
     default: "."
   config:
-    description: Path to patchwork.toml
+    description: Path to autopatch.toml
     required: false
   fail-on:
     description: Minimum severity that fails the job (critical|high|medium|low|none)
     default: "high"
   sarif-output:
     description: Path to write the SARIF report
-    default: "patchwork.sarif"
+    default: "autopatch.sarif"
   upload-sarif:
     description: Upload the SARIF report to GitHub Code Scanning
     default: "true"
@@ -38,7 +38,7 @@ runs:
       with:
         python-version: "3.12"
 
-    - name: Install patchwork
+    - name: Install autopatch
       shell: bash
       run: pip install "${{ github.action_path }}[yaml]"
 
@@ -59,7 +59,7 @@ runs:
         set +e
         ARGS="${{ inputs.path }}"
         [ -n "${{ inputs.config }}" ] && ARGS="$ARGS --config ${{ inputs.config }}"
-        patchwork scan $ARGS --format sarif -o "${{ inputs.sarif-output }}" --fail-on "${{ inputs.fail-on }}"
+        autopatch scan $ARGS --format sarif -o "${{ inputs.sarif-output }}" --fail-on "${{ inputs.fail-on }}"
         echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
     - name: Upload SARIF
@@ -74,7 +74,7 @@ runs:
       run: |
         ARGS="${{ inputs.path }}"
         [ -n "${{ inputs.config }}" ] && ARGS="$ARGS --config ${{ inputs.config }}"
-        patchwork fix $ARGS --agent "${{ inputs.agent }}" --max "${{ inputs.max-prs }}" --pr
+        autopatch fix $ARGS --agent "${{ inputs.agent }}" --max "${{ inputs.max-prs }}" --pr
 
     - name: Fail on findings
       if: steps.scan.outputs.exit_code != '0'

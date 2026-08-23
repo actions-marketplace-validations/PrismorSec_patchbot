@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from patchwork.models import Package
-from patchwork.feeds import file as file_feed
+from autopatch.models import Package
+from autopatch.feeds import file as file_feed
 
 FIXTURE = str(Path(__file__).parent / "fixtures" / "feed.json")
 

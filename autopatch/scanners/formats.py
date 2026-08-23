@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 from typing import List
 
-from patchwork.models import Finding, Package
+from autopatch.models import Finding, Package
 
 
 def parse_trivy(raw: str) -> List[Finding]:

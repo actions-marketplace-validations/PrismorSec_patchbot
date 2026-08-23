@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import List
 
-from patchwork.models import Finding, dedupe
-from patchwork.registry import load_plugins
-from patchwork.scanners import builtin
+from autopatch.models import Finding, dedupe
+from autopatch.registry import load_plugins
+from autopatch.scanners import builtin
 
 BUILTIN = {
     "trivy": builtin.trivy,
@@ -15,7 +15,7 @@ BUILTIN = {
 
 
 def run_all(cwd: str, scanners_config: dict) -> List[Finding]:
-    plugins = load_plugins("patchwork.scanners", BUILTIN)
+    plugins = load_plugins("autopatch.scanners", BUILTIN)
     findings: List[Finding] = []
     for name, cfg in scanners_config.items():
         cfg = dict(cfg or {})

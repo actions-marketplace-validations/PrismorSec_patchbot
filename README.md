@@ -1,4 +1,4 @@
-# patchwork
+# autopatch
 
 Bring-your-own-scanner, bring-your-own-feed vulnerability scanning, with
 Claude Code / Codex opening the fix PR.
@@ -25,13 +25,13 @@ pip install -e .
 ## Quickstart
 
 ```
-patchwork scan                          # table report, uses OSV by default
-patchwork scan --format sarif -o out.sarif
-patchwork fix --agent claude --dry-run  # print the fix prompt, make no changes
-patchwork fix --agent claude --pr       # open PRs for real (needs `claude` + `gh` on PATH)
+autopatch scan                          # table report, uses OSV by default
+autopatch scan --format sarif -o out.sarif
+autopatch fix --agent claude --dry-run  # print the fix prompt, make no changes
+autopatch fix --agent claude --pr       # open PRs for real (needs `claude` + `gh` on PATH)
 ```
 
-## Config (`patchwork.toml`)
+## Config (`autopatch.toml`)
 
 ```toml
 [inventory]
@@ -92,21 +92,21 @@ path = "./our-advisories.json"
 ## Writing a plugin
 
 Register a scanner, feed, or agent from your own pip package via entry points —
-no fork of patchwork required:
+no fork of autopatch required:
 
 ```toml
 # your_package/pyproject.toml
-[project.entry-points."patchwork.scanners"]
+[project.entry-points."autopatch.scanners"]
 mytool = "your_package.scanner:run"          # def run(cwd: str, config: dict) -> list[Finding]
 
-[project.entry-points."patchwork.feeds"]
+[project.entry-points."autopatch.feeds"]
 myfeed = "your_package.feed"                 # module with match(packages, config) -> list[Finding]
 
-[project.entry-points."patchwork.agents"]
+[project.entry-points."autopatch.agents"]
 myagent = "your_package.agent"               # module with run(prompt: str, cwd: str) -> int
 ```
 
-`patchwork plugins` lists everything currently registered.
+`autopatch plugins` lists everything currently registered.
 
 ## GitHub Actions
 
