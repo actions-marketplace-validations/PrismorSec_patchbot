@@ -9,6 +9,14 @@ description = "Bring-your-own-scanner, bring-your-own-feed vulnerability scannin
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Security",
+]
 dependencies = []
 
 [project.optional-dependencies]

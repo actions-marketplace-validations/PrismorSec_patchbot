@@ -5,7 +5,7 @@
 **Vulnerability scanning with your scanners, your threat feeds, and a coding agent that opens the fix PR.**
 
 [![PyPI](https://img.shields.io/pypi/v/patchbot?color=blue)](https://pypi.org/project/patchbot/)
-[![Python](https://img.shields.io/pypi/pyversions/patchbot)](https://pypi.org/project/patchbot/)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](https://pypi.org/project/patchbot/)
 [![CI](https://github.com/PrismorSec/patchbot/actions/workflows/ci.yml/badge.svg)](https://github.com/PrismorSec/patchbot/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![GitHub Action](https://img.shields.io/badge/GitHub-Action-2088FF?logo=githubactions&logoColor=white)](#github-actions)
