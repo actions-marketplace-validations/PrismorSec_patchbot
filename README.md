@@ -156,7 +156,7 @@ steps:
       fail-on: high
 ```
 
-![Code scanning alerts](docs/img/code-scanning.png)
+![Code scanning alerts](docs/img/code-scanning.jpg)
 
 Fix PRs with the `api` agent (no Node/npm install needed):
 
@@ -216,7 +216,7 @@ for a full copy-paste workflow (rendered below).
 
 A PR opened by `patchbot fix --pr`:
 
-![A patchbot fix PR](docs/img/fix-pr.png)
+![A patchbot fix PR](docs/img/fix-pr.jpg)
 
 ## Scheduled deployments (no CI at all)
 
