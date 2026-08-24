@@ -53,18 +53,19 @@ patchbot fix --pr                # bump or fix, verify, open one PR per package
 
 ## How it works
 
-```
-                 +- feeds ------------- OSV.dev . your OSV-format file / URL
-inventory -------+                                            |
- (lockfiles,     +- scanners ---------- trivy . grype . osv-scanner . any cmd
-  CycloneDX SBOM)                                             |
-                                                              v
-                                                   findings (deduplicated)
-                                                              |
-                                             +----------------+----------------+
-                                             v                                 v
-                                          report                              fix
-                                  table . json . SARIF          bump -> verify -> agent -> verify -> PR
+```mermaid
+flowchart LR
+    inv["Inventory<br/>lockfiles · CycloneDX SBOM"]
+    feeds["Feeds<br/>OSV.dev · your OSV file / URL"]
+    scanners["Scanners<br/>trivy · grype · osv-scanner · any cmd"]
+    findings["Findings<br/>(deduplicated)"]
+    report["Report<br/>table · json · SARIF"]
+    fix["Fix<br/>bump → verify → agent → verify → PR"]
+
+    inv --> feeds --> findings
+    inv --> scanners --> findings
+    findings --> report
+    findings --> fix
 ```
 
 **Inventory.** Parsers for npm, pnpm, and yarn lockfiles, `requirements*.txt`, `pyproject.toml`, `go.mod`, and `Cargo.toml`. For other ecosystems, point patchbot at a CycloneDX SBOM from `syft`, `cdxgen`, or your own tooling.
