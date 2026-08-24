@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from patchbot.registry import load_plugins
-from patchbot.agents import claude, codex
+from patchbot.agents import claude, codex, api, command, managed
 
-BUILTIN = {"claude": claude, "codex": codex}
+BUILTIN = {"claude": claude, "codex": codex, "api": api, "command": command, "managed": managed}
 
 
 def get(name: str):

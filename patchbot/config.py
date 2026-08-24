@@ -18,6 +18,8 @@ class Config:
     agent: str = "claude"
     max_prs: int = 5
     test_cmd: Optional[str] = None
+    model: Optional[str] = None
+    agent_config: Dict[str, str] = field(default_factory=dict)
 
     @classmethod
     def load(cls, path: Optional[str]) -> "Config":
@@ -42,4 +44,11 @@ class Config:
         cfg.agent = fix.get("agent", cfg.agent)
         cfg.max_prs = fix.get("max_prs", cfg.max_prs)
         cfg.test_cmd = fix.get("test_cmd", cfg.test_cmd)
+        cfg.model = fix.get("model", cfg.model)
+        if "cmd" in fix:
+            cfg.agent_config["cmd"] = fix["cmd"]
+        managed = fix.get("managed", {})
+        for key in ("agent_id", "environment_id", "vault_id"):
+            if key in managed:
+                cfg.agent_config[key] = managed[key]
         return cfg

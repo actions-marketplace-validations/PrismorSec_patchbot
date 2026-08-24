@@ -42,7 +42,7 @@ def test_dry_run_returns_prompt_without_touching_repo(tmp_path, monkeypatch):
 def test_successful_fix_commits_on_new_branch(tmp_path, monkeypatch):
     repo = _git_repo(tmp_path)
 
-    def fake_agent_run(prompt, cwd, timeout=600):
+    def fake_agent_run(prompt, cwd, model=None, timeout=600, config=None):
         lock = (repo / "package-lock.json")
         lock.write_text(json.dumps({
             "packages": {"node_modules/lodash": {"version": "4.17.21"}}
@@ -66,7 +66,7 @@ def test_successful_fix_commits_on_new_branch(tmp_path, monkeypatch):
 def test_failed_fix_resets_to_base_branch(tmp_path, monkeypatch):
     repo = _git_repo(tmp_path)
 
-    def noop_agent_run(prompt, cwd, timeout=600):
+    def noop_agent_run(prompt, cwd, model=None, timeout=600, config=None):
         return 0  # doesn't touch the lockfile -> version stays vulnerable
 
     fake_module = types.SimpleNamespace(run=noop_agent_run)

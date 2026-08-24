@@ -24,11 +24,23 @@ inputs:
     description: Open auto-fix PRs for found vulnerabilities
     default: "false"
   agent:
-    description: Coding agent to use for fixes (claude|codex)
+    description: Coding agent to use for fixes (claude|codex|api|managed)
     default: "claude"
+  model:
+    description: Model ID to pass to the agent (claude|codex|api|managed)
+    required: false
   max-prs:
     description: Max number of fix PRs to open per run
     default: "5"
+  managed-agent-id:
+    description: Managed Agents agent ID (from `patchbot managed init`), required when agent=managed
+    required: false
+  managed-environment-id:
+    description: Managed Agents environment ID, required when agent=managed
+    required: false
+  managed-vault-id:
+    description: Managed Agents vault ID, required when agent=managed
+    required: false
 
 runs:
   using: composite
@@ -40,10 +52,15 @@ runs:
 
     - name: Install patchbot
       shell: bash
-      run: pip install "${{ github.action_path }}[yaml]"
+      run: |
+        if [ "${{ inputs.agent }}" = "api" ] || [ "${{ inputs.agent }}" = "managed" ]; then
+          pip install "${{ github.action_path }}[yaml,api]"
+        else
+          pip install "${{ github.action_path }}[yaml]"
+        fi
 
     - name: Install agent CLI
-      if: inputs.fix == 'true'
+      if: inputs.fix == 'true' && (inputs.agent == 'claude' || inputs.agent == 'codex')
       shell: bash
       run: |
         if [ "${{ inputs.agent }}" = "codex" ]; then
@@ -71,9 +88,14 @@ runs:
     - name: Open fix PRs
       if: inputs.fix == 'true'
       shell: bash
+      env:
+        PATCHBOT_MANAGED_AGENT_ID: ${{ inputs.managed-agent-id }}
+        PATCHBOT_MANAGED_ENVIRONMENT_ID: ${{ inputs.managed-environment-id }}
+        PATCHBOT_MANAGED_VAULT_ID: ${{ inputs.managed-vault-id }}
       run: |
         ARGS="${{ inputs.path }}"
         [ -n "${{ inputs.config }}" ] && ARGS="$ARGS --config ${{ inputs.config }}"
+        [ -n "${{ inputs.model }}" ] && ARGS="$ARGS --model ${{ inputs.model }}"
         patchbot fix $ARGS --agent "${{ inputs.agent }}" --max "${{ inputs.max-prs }}" --pr
 
     - name: Fail on findings

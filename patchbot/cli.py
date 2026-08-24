@@ -47,6 +47,10 @@ def cmd_fix(args) -> int:
         print("No vulnerabilities found; nothing to fix.")
         return 0
 
+    agent_config = dict(cfg.agent_config)
+    if args.cmd:
+        agent_config["cmd"] = args.cmd
+
     results = fix.run(
         findings, cwd,
         agent_name=args.agent or cfg.agent,
@@ -54,6 +58,8 @@ def cmd_fix(args) -> int:
         open_pr=args.pr,
         test_cmd=args.test_cmd or cfg.test_cmd,
         dry_run=args.dry_run,
+        model=args.model or cfg.model,
+        agent_config=agent_config,
     )
     for r in results:
         print(f"[{r['status']}] {r['package']}: {r['detail']}")
@@ -85,7 +91,9 @@ def build_parser() -> argparse.ArgumentParser:
     fix_p = sub.add_parser("fix", help="open fix PRs for vulnerable packages via a coding agent")
     fix_p.add_argument("paths", nargs="*", default=["."])
     fix_p.add_argument("--config", help="path to patchbot.toml")
-    fix_p.add_argument("--agent", choices=["claude", "codex"])
+    fix_p.add_argument("--agent", help="claude | codex | api | command | managed | none, or a registered plugin")
+    fix_p.add_argument("--model", help="model ID to pass to the agent (claude/codex/api/managed)")
+    fix_p.add_argument("--cmd", help="shell command template for --agent command, e.g. 'aider --message {prompt}'")
     fix_p.add_argument("--max", type=int, help="max packages to fix in this run")
     fix_p.add_argument("--pr", action="store_true", help="push the branch and open a PR (needs gh)")
     fix_p.add_argument("--test-cmd", help="command to verify a fix before committing")
@@ -94,6 +102,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     plugins = sub.add_parser("plugins", help="list registered feeds, scanners, and agents")
     plugins.set_defaults(func=cmd_plugins)
+
+    from patchbot import managed_setup
+    managed_setup.add_subparser(sub)
 
     return parser
 

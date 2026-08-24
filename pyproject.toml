@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "patchbot"
-version = "0.1.0"
+version = "0.2.0"
 description = "Bring-your-own-scanner, bring-your-own-feed vulnerability scanning with agent-driven auto-fix PRs."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -13,6 +13,7 @@ dependencies = []
 
 [project.optional-dependencies]
 yaml = ["PyYAML"]
+api = ["anthropic"]
 dev = ["pytest"]
 
 [project.scripts]

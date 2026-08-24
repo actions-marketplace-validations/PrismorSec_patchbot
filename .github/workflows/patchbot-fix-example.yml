@@ -1,0 +1,30 @@
+name: patchbot fix (Managed Agents)
+# Copy this into your own repo's .github/workflows/. Requires one-time setup:
+#   pip install patchbot[api] && patchbot managed init
+# then store the three printed IDs as repo secrets.
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  security-events: write
+
+jobs:
+  patchbot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: PrismorSec/patchbot@v0
+        with:
+          fix: "true"
+          agent: managed
+          managed-agent-id: ${{ secrets.PATCHBOT_AGENT_ID }}
+          managed-environment-id: ${{ secrets.PATCHBOT_ENVIRONMENT_ID }}
+          managed-vault-id: ${{ secrets.PATCHBOT_VAULT_ID }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

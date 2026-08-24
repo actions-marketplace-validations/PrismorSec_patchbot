@@ -1,0 +1,8 @@
+{
+  "name": "patchbot-demo",
+  "private": true,
+  "description": "Deliberately vulnerable — used to generate patchbot's own screenshots and CI self-scan findings.",
+  "dependencies": {
+    "lodash": "^4.17.20"
+  }
+}
