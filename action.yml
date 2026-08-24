@@ -1,5 +1,5 @@
-name: patchbot
-description: Bring-your-own-scanner, bring-your-own-feed vulnerability scanning with agent-driven auto-fix PRs.
+name: Patchbot Vulnerability Scanner
+description: Vulnerability scanning with your own scanners and threat feeds, plus a coding agent that opens the fix PR.
 branding:
   icon: shield
   color: purple
