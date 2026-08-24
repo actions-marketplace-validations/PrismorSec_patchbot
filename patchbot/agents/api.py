@@ -1,4 +1,4 @@
-"""Anthropic API agent: no CLI, no npm/node — just `pip install patchbot[api]`.
+"""Anthropic API agent: no CLI, no npm/node: just `pip install patchbot[api]`.
 
 Runs a small tool loop (bash + write_file, scoped to cwd) via the Python
 SDK's tool runner. Good default for CI: nothing to install but a Python

@@ -1,4 +1,4 @@
-"""OSV.dev feed — the default, always-on threat feed.
+"""OSV.dev feed: the default, always-on threat feed.
 
 Batch-query adapted from prismor's supplychain/scoring/osv_lookup.py:
 querybatch returns id+modified only, so full details (severity, summary,

@@ -24,6 +24,6 @@ def test_managed_requires_github_token(tmp_path, monkeypatch):
 
 def test_api_agent_importable():
     # Just confirms the module loads and exposes run() without needing a
-    # live ANTHROPIC_API_KEY — the actual tool loop needs real credentials
+    # live ANTHROPIC_API_KEY: the actual tool loop needs real credentials
     # and is exercised manually (see README verification notes).
     assert callable(api.run)

@@ -1,6 +1,6 @@
 """Manifest and lockfile parsers.
 
-Ported from prismor's prismor/runtime/deps.py — trimmed to pure functions
+Ported from prismor's prismor/runtime/deps.py: trimmed to pure functions
 that return Package objects instead of dicts, since patchbot has no
 policy-feed correlation step of its own.
 """
@@ -209,7 +209,7 @@ def collect(workspace: Path) -> List[Package]:
     JS ecosystems resolve through lockfiles (npm/pnpm/yarn all merge into
     one flat name->version map, unioned since they're all the "npm" OSV
     ecosystem). Other ecosystems are read straight off the manifest since
-    patchbot doesn't parse poetry.lock/Cargo.lock/go.sum — see README for
+    patchbot doesn't parse poetry.lock/Cargo.lock/go.sum: see README for
     the CycloneDX SBOM path if you need transitive deps there.
     """
     packages: List[Package] = []

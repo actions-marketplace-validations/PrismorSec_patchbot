@@ -1,6 +1,6 @@
 """Tier 0 of the fix loop: a deterministic version bump, no agent involved.
 
-Most vulnerable-package fixes are exactly this — rewrite the pin, regenerate
+Most vulnerable-package fixes are exactly this: rewrite the pin, regenerate
 the lockfile, done. The agent tiers in fix.py only run when this fails
 (major bump breaks the build, tests fail, or the package isn't a direct
 dependency this module knows how to edit).
@@ -27,7 +27,7 @@ def _bump_npm(cwd: Path, name: str, version: str) -> bool:
     pattern = re.compile(rf'("{escaped}"\s*:\s*")[^"]*(")')
     new_text, count = pattern.subn(rf"\g<1>^{version}\g<2>", text)
     if count == 0:
-        return False  # not a direct dependency — let the agent tier handle it
+        return False  # not a direct dependency: let the agent tier handle it
     _write(manifest, new_text)
 
     if shutil.which("npm") and (cwd / "package-lock.json").exists():
@@ -39,7 +39,7 @@ def _bump_npm(cwd: Path, name: str, version: str) -> bool:
     if shutil.which("yarn") and (cwd / "yarn.lock").exists():
         result = subprocess.run(["yarn", "install", "--mode", "update-lockfile"], cwd=cwd, capture_output=True)
         return result.returncode == 0
-    return False  # no lockfile tool available to regenerate — don't leave it stale
+    return False  # no lockfile tool available to regenerate: don't leave it stale
 
 
 def _bump_pip(cwd: Path, name: str, version: str) -> bool:
@@ -93,7 +93,7 @@ def _bump_cargo(cwd: Path, name: str, version: str) -> bool:
             ["cargo", "update", "-p", name, "--precise", version], cwd=cwd, capture_output=True,
         )
         return result.returncode == 0
-    return True  # no lockfile yet — the manifest edit alone is the fix
+    return True  # no lockfile yet: the manifest edit alone is the fix
 
 
 _BUMPERS = {
@@ -107,7 +107,7 @@ _BUMPERS = {
 def try_bump(cwd: str, ecosystem: str, name: str, target_version: str) -> bool:
     """Attempt the deterministic fix. Returns True if the manifest (and
     lockfile, where applicable) were rewritten successfully. False means
-    "give up cleanly" — the caller escalates to the agent tier."""
+    "give up cleanly": the caller escalates to the agent tier."""
     bumper = _BUMPERS.get(ecosystem)
     if bumper is None:
         return False

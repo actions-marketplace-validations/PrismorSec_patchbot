@@ -1,5 +1,5 @@
 """One-time setup and scheduling for the `managed` (Claude Managed Agents)
-fix backend. Not part of the per-fix hot path — `patchbot managed init`
+fix backend. Not part of the per-fix hot path: `patchbot managed init`
 creates the Agent/Environment/Vault once; `patchbot managed deploy` sets up
 a cron-scheduled session that scans + fixes without any CI at all.
 """

@@ -1,6 +1,6 @@
 """Minimal, dependency-free version comparison for OSV range matching.
 
-Not a full semver/PEP440 implementation — just enough to order the
+Not a full semver/PEP440 implementation: just enough to order the
 numeric-dot-separated versions real-world ecosystems publish, which is
 what OSV's SEMVER/ECOSYSTEM ranges need. Falls back to string comparison
 when a version doesn't parse, so an unusual version never crashes a scan.
@@ -15,7 +15,7 @@ _NUM_RE = re.compile(r"\d+")
 def parse_version(v: str) -> tuple:
     """'1.2.3-rc.1' -> (1, 2, 3) for comparison purposes.
 
-    Pre-release/build suffixes are dropped rather than modeled — this is
+    Pre-release/build suffixes are dropped rather than modeled: this is
     a "good enough to order releases" comparator, not a spec-compliant one.
     """
     if not v:

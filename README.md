@@ -16,37 +16,37 @@
 
 ---
 
-patchbot is a modular dependency-vulnerability pipeline. It inventories the packages in a repository, matches them against any threat feed, accepts findings from any scanner, and fixes what it finds — deterministically when a version bump is enough, with a coding agent when it is not. Every fix is re-scanned before a pull request is opened.
+patchbot inventories the packages in your repository, matches them against any threat feed, accepts findings from any scanner, and fixes what it finds. When a version bump is enough, it bumps. When the bump breaks the build, it hands the failure to a coding agent. It re-scans before opening each pull request.
 
-It runs as a CLI, as a GitHub Action, or as a scheduled [Claude Managed Agents](https://platform.claude.com/docs/en/managed-agents/overview) deployment that needs no CI at all.
+Run it as a CLI, as a GitHub Action, or as a scheduled [Claude Managed Agents](https://platform.claude.com/docs/en/managed-agents/overview) deployment with no CI involved.
 
 ## Why patchbot
 
 | | Dependabot / Renovate | Trivy / Grype alone | **patchbot** |
 |---|---|---|---|
-| Bring your own threat feed (private advisories, OSV-format) | — | — | ✅ |
-| Bring your own scanner (any tool that emits SARIF / Trivy / Grype JSON) | — | n/a | ✅ |
-| Deterministic version bump + lockfile regen | ✅ | — | ✅ |
-| Fixes that need **code changes** (breaking major bump, failing tests) | — | — | ✅ agent tier |
-| Re-scan gates every PR | — | — | ✅ |
-| Agent runs **off** the CI runner, secrets never enter the sandbox | — | — | ✅ Managed Agents |
-| Works without CI (scheduled, any git host) | — | — | ✅ |
+| Bring your own threat feed (private advisories, OSV format) | no | no | yes |
+| Bring your own scanner (any tool that emits SARIF / Trivy / Grype JSON) | no | n/a | yes |
+| Version bump + lockfile regeneration with no model call | yes | no | yes |
+| Fixes that need **code changes** (breaking major bump, failing tests) | no | no | yes, agent tier |
+| Re-scan before every PR | no | no | yes |
+| Agent runs **off** the CI runner; secrets stay out of the sandbox | no | no | yes, Managed Agents |
+| Works without CI (scheduled, any git host) | no | no | yes |
 
 ## Installation
 
 ```bash
-pip install patchbot            # scan + deterministic fixes
+pip install patchbot            # scan + bump-only fixes
 pip install "patchbot[api]"     # + Anthropic-backed agent tiers (api, managed)
 ```
 
-Requires Python 3.11+. No other runtime dependencies.
+Requires Python 3.11 or newer. No other runtime dependencies.
 
 ## Quick start
 
 ```bash
-patchbot scan                    # inventory → OSV.dev → table report
+patchbot scan                    # inventory -> OSV.dev -> table report
 patchbot fix --dry-run           # preview the fix plan, change nothing
-patchbot fix --pr                # bump / fix, verify, open one PR per package
+patchbot fix --pr                # bump or fix, verify, open one PR per package
 ```
 
 <img src="docs/img/fix-dry-run.png" alt="patchbot fix --dry-run" width="800">
@@ -54,42 +54,42 @@ patchbot fix --pr                # bump / fix, verify, open one PR per package
 ## How it works
 
 ```
-                 ┌─ feeds ───────────── OSV.dev · your OSV-format file / URL
-inventory ───────┤                                            │
- (lockfiles,     └─ scanners ────────── trivy · grype · osv-scanner · any cmd
-  CycloneDX SBOM)                                             │
-                                                              ▼
+                 +- feeds ------------- OSV.dev . your OSV-format file / URL
+inventory -------+                                            |
+ (lockfiles,     +- scanners ---------- trivy . grype . osv-scanner . any cmd
+  CycloneDX SBOM)                                             |
+                                                              v
                                                    findings (deduplicated)
-                                                              │
-                                             ┌────────────────┴────────────────┐
-                                             ▼                                 ▼
-                                      report                                 fix
-                              table · json · SARIF              bump → verify → agent → verify → PR
+                                                              |
+                                             +----------------+----------------+
+                                             v                                 v
+                                          report                              fix
+                                  table . json . SARIF          bump -> verify -> agent -> verify -> PR
 ```
 
-**Inventory.** Built-in parsers for npm / pnpm / yarn lockfiles, `requirements*.txt`, `pyproject.toml`, `go.mod`, and `Cargo.toml`, plus any CycloneDX SBOM (`syft`, `cdxgen`, or your own) for ecosystems without a native parser.
+**Inventory.** Parsers for npm, pnpm, and yarn lockfiles, `requirements*.txt`, `pyproject.toml`, `go.mod`, and `Cargo.toml`. For other ecosystems, point patchbot at a CycloneDX SBOM from `syft`, `cdxgen`, or your own tooling.
 
-**Feeds.** OSV.dev is on by default. A private feed is any file or URL serving OSV-schema JSON — no custom format to maintain.
+**Feeds.** OSV.dev is on by default. To add a private feed, serve OSV-schema JSON from a file or URL. You keep one format.
 
-**Scanners.** Wrappers for `trivy`, `grype`, and `osv-scanner`, or point the `command` scanner at any tool that writes SARIF, Trivy, Grype, or osv-scanner JSON to stdout.
+**Scanners.** Wrappers for `trivy`, `grype`, and `osv-scanner`. The `command` scanner runs any tool that writes SARIF, Trivy, Grype, or osv-scanner JSON to stdout.
 
-**Fix.** A tiered loop, one branch per vulnerable package:
+**Fix.** One branch per vulnerable package, in four steps:
 
-1. **Deterministic bump** — rewrite the pin to the lowest version that clears every advisory, regenerate the lockfile with the ecosystem's own tool. No model involved.
-2. **Verify** — re-scan, run `test_cmd`, and reject any diff that reaches outside the dependency surface (CI config, dotfiles).
-3. **Agent escalation** — only if step 2 fails. The agent's brief is the *failure* ("bumped `lodash` to 4.18.0; tests fail with …"), not the original task.
-4. **Verify again**, then commit and open the PR with the advisory table in the body.
+1. **Bump.** patchbot rewrites the pin to the lowest version that clears every advisory and regenerates the lockfile with the ecosystem's own tool. No model call.
+2. **Verify.** patchbot re-scans, runs `test_cmd`, and rejects any diff that reaches outside the dependency surface (CI config, dotfiles).
+3. **Escalate.** If step 2 fails, patchbot briefs the agent with the failure itself: "bumped `lodash` to 4.18.0; tests fail with ...". The agent fixes the code.
+4. **Verify again.** Then commit, push, and open the PR with the advisory table in the body.
 
-`--agent none` turns off step 3 for a pure deterministic mode.
+`--agent none` skips step 3 and gives you bump-only mode.
 
 ## Commands
 
 | Command | What it does |
 |---|---|
-| `patchbot scan [paths…]` | Run the pipeline and print a report. Exits non-zero when any finding meets `--fail-on` (default `high`). |
-| `patchbot fix [paths…]` | Tiered fix loop. `--dry-run` previews, `--pr` pushes and opens pull requests via `gh`. |
-| `patchbot plugins` | List every registered feed, scanner, and agent — built-in and third-party. |
-| `patchbot managed …` | One-time setup (`init`) and scheduling (`deploy`, `list`, `pause`, `unpause`) for the Managed Agents backend. |
+| `patchbot scan [paths...]` | Run the pipeline and print a report. Exits 1 when any finding meets `--fail-on` (default `high`). |
+| `patchbot fix [paths...]` | Run the fix loop. `--dry-run` previews; `--pr` pushes and opens pull requests through `gh`. |
+| `patchbot plugins` | List each registered feed, scanner, and agent, built in and third party. |
+| `patchbot managed ...` | Set up (`init`) and schedule (`deploy`, `list`, `pause`, `unpause`) the Managed Agents backend. |
 
 <details>
 <summary><code>patchbot scan --format json</code></summary>
@@ -105,7 +105,7 @@ inventory ───────┤                                            �
 
 ## Configuration
 
-`patchbot.toml` in the repository root. Every CLI flag overrides its config-file counterpart.
+Put `patchbot.toml` in the repository root. CLI flags override the file.
 
 ```toml
 [inventory]
@@ -115,14 +115,14 @@ paths = ["."]
 [feeds.osv]
 enabled = true
 
-[feeds.internal]                # bring your own threat feed
-type = "url"                    # or "file" with path = "…"
+[feeds.internal]                # your own threat feed
+type = "url"                    # or "file" with path = "..."
 url  = "https://intel.example.com/advisories.json"
 
 [scanners.trivy]
 enabled = true
 
-[scanners.custom]               # bring your own scanner
+[scanners.custom]               # your own scanner
 type   = "command"
 cmd    = "./scan.sh"
 format = "sarif"                # sarif | trivy | grype | osv-scanner
@@ -138,29 +138,29 @@ max_prs  = 5
 test_cmd = "npm test"
 # cmd = "aider --yes --message {prompt}"     # agent = "command" only
 
-[fix.managed]                   # agent = "managed" only — from `patchbot managed init`
-agent_id       = "agent_…"
-environment_id = "env_…"
-vault_id       = "vlt_…"
+[fix.managed]                   # agent = "managed" only; printed by `patchbot managed init`
+agent_id       = "agent_..."
+environment_id = "env_..."
+vault_id       = "vlt_..."
 ```
 
 ## Choosing an agent backend
 
-| Backend | Runs where | Needs | Best for |
+| Backend | Runs where | Needs | Use it for |
 |---|---|---|---|
-| `claude` / `codex` | Your machine or runner, via the CLI on `PATH` | The CLI, already authenticated | Local development |
-| `api` | Your runner, in-process | `pip install patchbot[api]`, `ANTHROPIC_API_KEY` | CI without Node |
-| `command` | Wherever your tool runs | Any agent that takes a prompt (`aider`, `opencode`, …) | Non-Anthropic models |
-| `managed` | **Anthropic's sandbox** — never your runner | `patchbot managed init` once, three IDs as secrets | CI where the agent must not see repo secrets |
+| `claude` / `codex` | Your machine or runner, through the CLI on `PATH` | The CLI, logged in | Local development |
+| `api` | Your runner, in process | `pip install patchbot[api]`, `ANTHROPIC_API_KEY` | CI without Node |
+| `command` | Wherever your tool runs | Any agent that accepts a prompt (`aider`, `opencode`, ...) | Non-Anthropic models |
+| `managed` | **Anthropic's sandbox**, off your runner | `patchbot managed init` once, three IDs as secrets | CI where the agent must not see repo secrets |
 
-### Managed Agents — the recommended CI backend
+### Managed Agents, the recommended CI backend
 
-An agent with a shell on your CI runner sits next to your repository secrets. The `managed` backend moves it out: the session runs in a [Claude Managed Agents](https://platform.claude.com/docs/en/managed-agents/overview) sandbox, `git push` is authenticated through Anthropic's git proxy, and the pull request is created through a vaulted GitHub MCP credential. The GitHub token never enters the sandbox. patchbot still re-scans the pushed branch host-side — a session's own success report is never the gate.
+An agent with a shell on your CI runner sits next to your repository secrets. The `managed` backend moves the agent into a [Claude Managed Agents](https://platform.claude.com/docs/en/managed-agents/overview) sandbox. Anthropic's git proxy authenticates `git push`; a vaulted GitHub MCP credential creates the pull request. Your GitHub token stays outside the sandbox. patchbot then re-scans the pushed branch on your side before it treats the fix as done.
 
 ```bash
 pip install "patchbot[api]"
 patchbot managed init --github-mcp-token "$GITHUB_MCP_TOKEN"
-# → agent_id, environment_id, vault_id  →  store as repo secrets
+# prints agent_id, environment_id, vault_id; store them as repo secrets
 patchbot fix --agent managed --pr
 ```
 
@@ -227,10 +227,10 @@ steps:
   - uses: actions/checkout@v4
   - uses: PrismorSec/patchbot@v0
     with:
-      config: patchbot.toml    # [feeds.internal] url = …
+      config: patchbot.toml    # [feeds.internal] url = ...
 ```
 
-All inputs are documented in [`action.yml`](./action.yml); a complete workflow lives in [`.github/workflows/patchbot-fix-example.yml`](.github/workflows/patchbot-fix-example.yml).
+[`action.yml`](./action.yml) documents each input. [`.github/workflows/patchbot-fix-example.yml`](.github/workflows/patchbot-fix-example.yml) is a complete workflow you can copy.
 
 A pull request opened by `patchbot fix --pr`:
 
@@ -238,21 +238,21 @@ A pull request opened by `patchbot fix --pr`:
 
 ## Scheduled deployments (no CI)
 
-`patchbot managed deploy` creates a cron-scheduled Managed Agents session that clones a list of repositories, scans, fixes, and opens pull requests on its own. Nothing here is GitHub-Actions-specific, so it works for GitLab and Bitbucket too.
+`patchbot managed deploy` creates a cron-scheduled Managed Agents session that clones your repositories, scans, fixes, and opens pull requests. Nothing in it depends on GitHub Actions, so it works with GitLab and Bitbucket too.
 
 ```bash
 patchbot managed deploy \
   --repos owner/api,owner/web \
   --cron "0 6 * * *" --tz UTC \
-  --agent-id agent_… --environment-id env_… --vault-id vlt_… \
-  --run-now                       # fire one session immediately to test
+  --agent-id agent_... --environment-id env_... --vault-id vlt_... \
+  --run-now                       # fire one session now to test
 ```
 
-Manage it afterward with `patchbot managed list | pause | unpause`. Scheduled runs are jittered by up to nine minutes, and 1–3 AM local wall-clock times can skip or double-fire on DST transitions — schedule outside that window or use UTC when it matters.
+Manage it with `patchbot managed list | pause | unpause`. Anthropic jitters scheduled runs by up to nine minutes, and 1 to 3 AM local wall-clock times can skip or double-fire across DST changes. Schedule outside that window, or use UTC.
 
 ## Extending patchbot
 
-Register a scanner, feed, or agent from your own package through entry points — no fork required.
+Register a scanner, feed, or agent from your own package through entry points. No fork needed.
 
 ```toml
 # your_package/pyproject.toml
@@ -266,19 +266,19 @@ myfeed = "your_package.feed"             # match(packages, config) -> list[Findi
 myagent = "your_package.agent"           # run(prompt, cwd, model=None, timeout=600, config=None) -> int
 ```
 
-Without writing Python, `[scanners.*] type = "command"` and `[feeds.*] type = "url" | "file"` cover most cases. `cmd` values run through the shell — point them only at tools you trust.
+If you would rather not write Python, `[scanners.*] type = "command"` and `[feeds.*] type = "url" | "file"` cover most cases. `cmd` values run through your shell, so point them at tools you trust.
 
 ## FAQ
 
-**Why did a fix report `failed`?** The reason is printed: the advisory still reproduces after the bump or agent run, `test_cmd` failed (with the log tail), or the change touched files outside the dependency surface. The branch is discarded; nothing partial is committed.
+**Why did a fix report `failed`?** patchbot prints the reason: the advisory still reproduces after the bump or the agent run, `test_cmd` failed (with the log tail), or the change touched files outside the dependency surface. patchbot discards the branch and commits nothing.
 
-**What sets the exit code?** `scan` exits 1 when any finding meets `--fail-on` or worse (`none` always exits 0). `fix` exits 1 if any package could not be fixed.
+**What sets the exit code?** `scan` exits 1 when any finding meets `--fail-on` or worse; `none` exits 0. `fix` exits 1 if it could not fix any package.
 
-**How do I suppress one advisory?** `[report] ignore = ["GHSA-…"]`.
+**How do I suppress one advisory?** `[report] ignore = ["GHSA-..."]`.
 
 **Do I need Node in CI?** Only for `--agent claude` or `codex`. The `api` and `managed` backends need Python alone.
 
-**Which ecosystems get transitive dependencies?** npm, pnpm, and yarn via their lockfiles. For Python, Go, and Rust, feed patchbot a CycloneDX SBOM (`[inventory] sbom = …`) to include the full resolved tree.
+**Which ecosystems include transitive dependencies?** npm, pnpm, and yarn, through their lockfiles. For Python, Go, and Rust, set `[inventory] sbom` to a CycloneDX file to scan the full resolved tree.
 
 ## Development
 
@@ -289,7 +289,7 @@ python -m venv .venv && .venv/bin/pip install -e ".[dev,yaml,api]"
 docs/screenshots.sh              # regenerate docs/img (needs charmbracelet/freeze)
 ```
 
-`examples/demo-npm` is deliberately vulnerable; the repository's own CI scans it so the Security tab always shows live findings.
+`examples/demo-npm` ships with a vulnerable `lodash` on purpose. The repository's own CI scans it, so the Security tab always shows live findings.
 
 ## License
 

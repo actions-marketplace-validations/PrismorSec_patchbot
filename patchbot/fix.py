@@ -1,12 +1,12 @@
 """Tiered fix loop: one branch + one PR per vulnerable package.
 
 Tier 0 (patchbot.bump) tries a deterministic version bump + lockfile
-regen first — no agent involved, mirrors what Dependabot already does well.
+regen first: no agent involved, mirrors what Dependabot already does well.
 Only when that fails to clear the advisory (or fails a configured
 test_cmd) does the configured agent get a turn, with the failure itself as
 its brief rather than the original vague "go fix this" task.
 
-Sequential by design (`--max` caps how many packages get a PR per run) —
+Sequential by design (`--max` caps how many packages get a PR per run) -
 concurrent agents editing the same working tree would race on git state.
 """
 from __future__ import annotations
@@ -21,7 +21,7 @@ from patchbot.models import Finding
 from patchbot.versions import version_gte
 
 # Files an agent is allowed to have touched. Anything outside this stays
-# clean — a CI-hosted agent has a shell, and a diff that reaches outside
+# clean: a CI-hosted agent has a shell, and a diff that reaches outside
 # the dependency surface (CI config, dotfiles, .git internals) is rejected
 # rather than shipped in a PR.
 _DISALLOWED_PREFIXES = (".github/", ".git/", ".gitlab-ci", ".circleci/")
@@ -109,7 +109,7 @@ def _diff_allowed(cwd: str) -> bool:
 
 def _verify(cwd: str, ecosystem: str, name: str, target_version: Optional[str],
             original_version: str, test_cmd: Optional[str]) -> tuple:
-    """Returns (ok, detail) — detail is empty on success, or a failure
+    """Returns (ok, detail): detail is empty on success, or a failure
     summary suitable for handing to the next tier as its prompt."""
     new_version = _rescan_version(cwd, ecosystem, name)
     if target_version:
@@ -176,7 +176,7 @@ def run(
                 if bumped else bump_prompt
             )
             if agent_name == "managed":
-                # The session edits a remote clone, not `cwd` — push what we
+                # The session edits a remote clone, not `cwd`: push what we
                 # have so far so it exists to check out, then pull its result
                 # back before verifying locally.
                 _git(["add", "-A"], cwd)

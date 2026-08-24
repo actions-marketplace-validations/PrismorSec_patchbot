@@ -2,7 +2,7 @@
 
 Accepts either a bare list of OSV vuln records or `{"vulns": [...]}`
 (OSV's own bulk export shape), so a user's private feed needs no custom
-parser — just OSV-format JSON.
+parser: just OSV-format JSON.
 """
 from __future__ import annotations
 

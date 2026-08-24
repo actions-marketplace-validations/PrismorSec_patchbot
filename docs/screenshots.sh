@@ -17,4 +17,4 @@ freeze --execute "$PB plugins" -o "$OUT/plugins.png" "${FREEZE_OPTS[@]}"
 freeze .github/workflows/patchbot-fix-example.yml -o "$OUT/workflow.png" "${FREEZE_OPTS[@]}"
 
 echo "Wrote screenshots to $OUT/"
-echo "code-scanning.png and fix-pr.png are captured manually from GitHub — see README."
+echo "code-scanning.png and fix-pr.png are captured manually from GitHub: see README."

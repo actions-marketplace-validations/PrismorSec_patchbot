@@ -1,6 +1,6 @@
 """Built-in scanner wrappers: shell out to a CLI, parse its JSON output.
 
-Each expects its tool to already be installed (trivy, grype, osv-scanner) —
+Each expects its tool to already be installed (trivy, grype, osv-scanner) -
 patchbot doesn't manage tool installs; the GitHub Action or the user's own
 environment does. `command` is the generic BYO-scanner escape hatch: run
 any command and parse its stdout with one of the known formats.

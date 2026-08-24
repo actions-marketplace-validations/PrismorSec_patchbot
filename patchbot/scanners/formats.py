@@ -1,6 +1,6 @@
 """Parsers from third-party scanner output formats into Finding lists.
 
-Each parser is deliberately tolerant of missing fields — scanner output
+Each parser is deliberately tolerant of missing fields: scanner output
 shapes vary across versions, and a partially-populated Finding is better
 than a crashed scan.
 """
