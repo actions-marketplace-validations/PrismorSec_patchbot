@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![GitHub Action](https://img.shields.io/badge/GitHub-Action-2088FF?logo=githubactions&logoColor=white)](#github-actions)
 
-<img src="docs/img/scan.png" alt="patchbot scan output" width="800">
+<img src="docs/img/patchbot-demo.gif" alt="patchbot finds 5 advisories, fixes them, and re-scans clean" width="800">
 
 </div>
 
@@ -91,6 +91,12 @@ flowchart LR
 | `patchbot fix [paths...]` | Run the fix loop. `--dry-run` previews; `--pr` pushes and opens pull requests through `gh`. |
 | `patchbot plugins` | List each registered feed, scanner, and agent, built in and third party. |
 | `patchbot managed ...` | Set up (`init`) and schedule (`deploy`, `list`, `pause`, `unpause`) the Managed Agents backend. |
+
+<details>
+<summary><code>patchbot scan</code></summary>
+<br>
+<img src="docs/img/scan.png" alt="patchbot scan" width="800">
+</details>
 
 <details>
 <summary><code>patchbot scan --format json</code></summary>
